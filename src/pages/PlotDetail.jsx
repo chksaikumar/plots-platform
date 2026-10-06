@@ -5,7 +5,7 @@ import { useListings } from "../context/ListingsContext";
 import { getListingById, getLocalityTrend } from "../lib/listings";
 import { formatINR, formatINRShort, formatPerSqYd, statusLabel } from "../utils/format";
 import { useFavorites } from "../hooks/useFavorites";
-import { PlotArtwork, VastuBadge, ApprovalBadges, StatusPill } from "../components/PlotCard";
+import PlotCard, { PlotArtwork, VastuBadge, ApprovalBadges, StatusPill } from "../components/PlotCard";
 import EmiCalculator from "../components/EmiCalculator";
 import RoiEstimator from "../components/RoiEstimator";
 import PriceTrendChart from "../components/PriceTrendChart";
