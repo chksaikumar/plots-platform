@@ -1,15 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getListings } from "../lib/listings";
 
-const ListingsContext = createContext({ listings: [], localities: {}, source: "sample", loading: true });
+const ListingsContext = createContext({ listings: [], localities: {}, loading: true, error: null });
 
 export function ListingsProvider({ children }) {
-  const [state, setState] = useState({ listings: [], localities: {}, source: "sample", loading: true });
+  const [state, setState] = useState({ listings: [], localities: {}, loading: true, error: null });
 
   useEffect(() => {
     let alive = true;
     getListings().then((res) => {
-      if (alive) setState({ ...res, loading: false });
+      if (alive) setState({ listings: res.listings, localities: res.localities, error: res.error || null, loading: false });
     });
     return () => {
       alive = false;

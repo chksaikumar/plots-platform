@@ -15,6 +15,7 @@ import {
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { formatINRShort } from "../../utils/format";
+import seedData from "../../data/listings.json";
 
 const APPROVALS = ["DTCP", "HMDA", "RERA", "CMDA", "BMRDA", "BDA"];
 const FACINGS = ["East", "West", "North", "South", "North-East", "North-West", "South-East", "South-West"];
@@ -220,6 +221,8 @@ export default function Admin() {
   const [editing, setEditing] = useState(null); // doc snapshot or "new"
   const [saving, setSaving] = useState(false);
   const [opError, setOpError] = useState("");
+  const [seeding, setSeeding] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
 
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate("/signin");
@@ -300,6 +303,38 @@ export default function Admin() {
       setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
     } catch {
       setOpError("Could not update the lead. Check your connection and try again.");
+    }
+  };
+
+  // Imports the bundled seed listings into the live Firestore "listings"
+  // collection. Uses the admin's own Firestore access.
+  const seedListings = async () => {
+    const rows = seedData.listings || [];
+    if (!window.confirm(`This will add ${rows.length} sample listings to the live database. Continue?`)) return;
+    setSeeding(true);
+    setSeedMsg("");
+    setOpError("");
+    try {
+      let done = 0;
+      for (const l of rows) {
+        const { id, ...rest } = l;
+        await setDoc(doc(db, "listings", id), {
+          ...rest,
+          active: true,
+          createdBy: user.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        done += 1;
+        setSeedMsg(`Seeding... ${done} of ${rows.length}`);
+      }
+      setSeedMsg(`Done. ${done} sample listings are now live in the database.`);
+      refresh();
+    } catch {
+      setSeedMsg("");
+      setOpError("Seeding failed. Check your connection and try again.");
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -436,7 +471,19 @@ export default function Admin() {
                 <button onClick={() => setEditing("new")} className="rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-800">
                   Add listing
                 </button>
+                <button
+                  onClick={seedListings}
+                  disabled={seeding}
+                  className="rounded-xl border border-gold-300 bg-gold-50 px-5 py-2.5 text-sm font-semibold text-gold-800 transition-all hover:bg-gold-100 disabled:opacity-50"
+                >
+                  {seeding ? "Seeding..." : "Seed sample listings"}
+                </button>
               </div>
+              {seedMsg && (
+                <p className={`mt-3 text-sm font-medium ${seedMsg.startsWith("Done") ? "text-brand-700" : "text-ink-500"}`}>
+                  {seedMsg}
+                </p>
+              )}
               <div className="mt-4 overflow-x-auto rounded-2xl bg-white shadow-card ring-1 ring-ink-100">
                 <table className="w-full min-w-[760px] border-collapse text-sm">
                   <thead>

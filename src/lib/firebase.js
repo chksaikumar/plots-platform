@@ -11,8 +11,8 @@ const config = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// True only when the Firebase config is present. Otherwise the site runs on
-// the local sample data in src/data/listings.json with guest-only shortlists.
+// True only when the Firebase config is present. Firebase is the only
+// data source: without it the app shows the setup screen.
 export const isDbEnabled = Boolean(config.apiKey && config.projectId);
 
 let auth = null;

@@ -7,7 +7,7 @@ const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 placeholder:text-ink-300 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
 export default function SignUp() {
-  const { signUp, dbEnabled } = useAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,10 +15,6 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
 
   const go = async () => {
-    if (!dbEnabled) {
-      setError("Demo mode: sign-up activates once Firebase is connected. See FIREBASE_SETUP.md in the project.");
-      return;
-    }
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -37,12 +33,6 @@ export default function SignUp() {
 
   return (
     <AuthShell title="Create your account" subtitle="Shortlist plots, sync across devices and track your enquiries.">
-      {!dbEnabled && (
-        <div className="mb-5 rounded-xl bg-gold-50 px-4 py-3 text-xs leading-relaxed text-gold-800 ring-1 ring-inset ring-gold-200">
-          <span className="font-bold">Demo mode.</span> The site is running on sample data.
-          Sign-up activates once Firebase is connected. See FIREBASE_SETUP.md in the project.
-        </div>
-      )}
       <div className="space-y-3">
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" type="email" className={inputCls} />
         <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className={inputCls} onKeyDown={(e) => e.key === "Enter" && go()} />

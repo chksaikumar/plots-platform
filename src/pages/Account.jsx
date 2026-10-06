@@ -15,7 +15,7 @@ const STATUS_STYLES = {
 };
 
 export default function Account() {
-  const { user, isSignedIn, signOut, dbEnabled, isAdmin } = useAuth();
+  const { user, isSignedIn, signOut, isAdmin } = useAuth();
   const { listings } = useListings();
   const navigate = useNavigate();
   const [enquiries, setEnquiries] = useState([]);
@@ -26,7 +26,7 @@ export default function Account() {
       navigate("/signin");
       return;
     }
-    if (!dbEnabled || !db) {
+    if (!db) {
       setLoading(false);
       return;
     }
@@ -43,7 +43,7 @@ export default function Account() {
         setLoading(false);
       }
     })();
-  }, [isSignedIn, user, dbEnabled, navigate]);
+  }, [isSignedIn, user, navigate]);
 
   if (!isSignedIn) return null;
 
@@ -52,7 +52,12 @@ export default function Account() {
       <Reveal className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-ink-950">My account</h1>
-          <p className="mt-2 text-sm text-ink-500">{user?.email}</p>
+          <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-500">
+            {user?.email}
+            <span className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${isAdmin ? "bg-gold-500 text-white" : "bg-ink-100 text-ink-600"}`}>
+              {isAdmin ? "Administrator" : "Member"}
+            </span>
+          </p>
         </div>
         <div className="flex gap-2">
           {isAdmin && (
@@ -74,10 +79,6 @@ export default function Account() {
               <div key={i} className="h-24 animate-pulse rounded-2xl bg-ink-100" />
             ))}
           </div>
-        ) : !dbEnabled ? (
-          <p className="mt-4 rounded-2xl bg-white p-6 text-sm text-ink-500 shadow-card ring-1 ring-ink-100">
-            Enquiry history needs the database. Connect Firebase to track your enquiries here.
-          </p>
         ) : enquiries.length === 0 ? (
           <div className="mt-4 rounded-2xl bg-white p-10 text-center shadow-card ring-1 ring-ink-100">
             <p className="text-sm text-ink-500">You have not sent any enquiries yet.</p>

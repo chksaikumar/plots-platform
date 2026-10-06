@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db, isDbEnabled } from "../lib/firebase";
+import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 placeholder:text-ink-300 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
-// Lead enquiry form. Saves to Firestore when configured, otherwise
-// shows a local success state (front-end demo mode).
+// Lead enquiry form. Saves every enquiry to the Firestore "enquiries"
+// collection so the admin sees it in the leads inbox.
 export default function EnquiryForm({ listingId = null, listingTitle = null }) {
   const { user } = useAuth();
   const [form, setForm] = useState({ name: "", phone: "", email: user?.email || "", message: "" });
@@ -24,20 +24,16 @@ export default function EnquiryForm({ listingId = null, listingTitle = null }) {
     setStatus("sending");
     setError("");
     try {
-      if (isDbEnabled && db) {
-        await addDoc(collection(db, "enquiries"), {
-          listingId,
-          userId: user ? user.uid : null,
-          name: form.name.trim(),
-          phone: form.phone.trim(),
-          email: form.email.trim() || (user?.email ?? ""),
-          message: form.message.trim(),
-          status: "new",
-          createdAt: serverTimestamp(),
-        });
-      } else {
-        await new Promise((r) => setTimeout(r, 700));
-      }
+      await addDoc(collection(db, "enquiries"), {
+        listingId,
+        userId: user ? user.uid : null,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim() || (user?.email ?? ""),
+        message: form.message.trim(),
+        status: "new",
+        createdAt: serverTimestamp(),
+      });
       setStatus("done");
     } catch {
       setError("Something went wrong. Please try again or call us directly.");
@@ -99,11 +95,6 @@ export default function EnquiryForm({ listingId = null, listingTitle = null }) {
       >
         {status === "sending" ? "Sending..." : "Request Callback"}
       </button>
-      {!isDbEnabled && (
-        <p className="mt-2.5 rounded-lg bg-gold-50 px-3 py-2 text-center text-[11px] leading-relaxed text-gold-800 ring-1 ring-inset ring-gold-200">
-          Demo mode: this enquiry is not saved anywhere. Connect Firebase to receive real leads.
-        </p>
-      )}
       <p className="mt-2.5 text-center text-[11px] text-ink-400">
         By submitting, you agree to be contacted about this enquiry.
       </p>

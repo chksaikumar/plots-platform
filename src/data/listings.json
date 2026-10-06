@@ -1,6 +1,6 @@
 {
   "_schema": {
-    "_description": "Listings data for the plots discovery platform. Replace the sample listings below with real data. Keep every field; the UI reads all of them.",
+    "_description": "SEED DATA ONLY. This file is not live data and the site never reads listings from it at runtime. It exists for one purpose: the 'Seed sample listings' button in the admin panel (/admin) imports these 24 documents into the Firestore 'listings' collection. To change what the site shows, add or edit listings in the admin panel or directly in Firestore.",
     "listing": {
       "id": "unique slug, e.g. 'emerald-enclave-shadnagar'",
       "title": "display name of the plot project",

@@ -1,9 +1,8 @@
-import sample from "../data/listings.json";
+import { localities, reraPortals } from "../data/reference";
 import { db, isDbEnabled } from "./firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-// Map a Firestore listing document to the app's listing shape
-// (identical to the shape in listings.json).
+// Map a Firestore listing document to the app's listing shape.
 export function mapDbListing(id, data) {
   const d = data || {};
   return {
@@ -33,27 +32,35 @@ export function mapDbListing(id, data) {
   };
 }
 
-// Returns { listings, localities, source: 'db' | 'sample' }.
-// Uses Firestore when configured AND it has active listings,
-// otherwise falls back to the sample JSON.
+// Returns { listings, localities, source: 'db' } on success, or
+// { listings: [], localities, error } when Firebase is not configured
+// or the query fails. Listings come ONLY from Firestore. There is no
+// sample-data fallback.
 export async function getListings() {
-  const localities = sample.localities;
-  if (isDbEnabled && db) {
-    try {
-      const q = query(collection(db, "listings"), where("active", "==", true));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        return {
-          listings: snap.docs.map((d) => mapDbListing(d.id, d.data())),
-          localities,
-          source: "db",
-        };
-      }
-    } catch {
-      // fall through to sample data
-    }
+  if (!isDbEnabled || !db) {
+    return {
+      listings: [],
+      localities,
+      source: "db",
+      error: "Firebase is not configured. Add your Firebase config to a .env file and rebuild.",
+    };
   }
-  return { listings: sample.listings, localities, source: "sample" };
+  try {
+    const q = query(collection(db, "listings"), where("active", "==", true));
+    const snap = await getDocs(q);
+    return {
+      listings: snap.docs.map((d) => mapDbListing(d.id, d.data())),
+      localities,
+      source: "db",
+    };
+  } catch (e) {
+    return {
+      listings: [],
+      localities,
+      source: "db",
+      error: "Could not load listings from the database. Check your connection and try again.",
+    };
+  }
 }
 
 export function getListingById(listings, id) {
@@ -71,7 +78,7 @@ export function getLocalityTrend(listing, localities) {
   return null;
 }
 
-export const reraPortals = sample._meta.reraPortals;
+export { reraPortals };
 
 export function uniqueValues(listings, key) {
   return [...new Set(listings.map((l) => l[key]).filter(Boolean))].sort();
