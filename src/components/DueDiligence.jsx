@@ -31,6 +31,7 @@ const CHECKS = [
 export default function DueDiligence({ state, approvals }) {
   const [done, setDone] = useState([]);
   const portal = reraPortals[state];
+  const approvalList = Array.isArray(approvals) ? approvals : [];
 
   const toggle = (i) =>
     setDone((prev) => (prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]));
@@ -41,7 +42,7 @@ export default function DueDiligence({ state, approvals }) {
         <div>
           <h3 className="font-display text-xl font-semibold text-ink-950">Legal Due-Diligence Checklist</h3>
           <p className="mt-1 text-xs text-ink-400">
-            Work through this list before paying any advance. This venture lists {approvals.join(", ")} approval{approvals.length > 1 ? "s" : ""}.
+            Work through this list before paying any advance. This venture lists {approvalList.join(", ")} approval{approvalList.length > 1 ? "s" : ""}.
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-800">

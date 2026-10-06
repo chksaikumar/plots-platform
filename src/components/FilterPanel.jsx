@@ -18,11 +18,14 @@ const FACING_OPTIONS = ["East", "West", "North", "South", "North-East", "North-W
 
 export function applyFilters(listings, f) {
   return listings.filter((l) => {
+    const approvals = Array.isArray(l.approvals) ? l.approvals : [];
+    const price = Number(l.price) || 0;
+    const size = Number(l.sizeSqYd) || 0;
     if (f.state !== "all" && l.state !== f.state) return false;
     if (f.city !== "all" && l.city !== f.city) return false;
-    if (f.approvals.length > 0 && !f.approvals.every((a) => l.approvals.includes(a))) return false;
-    if (l.price > f.maxPrice) return false;
-    if (l.sizeSqYd < f.minSize || l.sizeSqYd > f.maxSize) return false;
+    if (f.approvals.length > 0 && !f.approvals.every((a) => approvals.includes(a))) return false;
+    if (price > f.maxPrice) return false;
+    if (size < f.minSize || size > f.maxSize) return false;
     if (f.facing !== "all" && l.facing !== f.facing) return false;
     if (f.vastuOnly && !l.vastuFriendly) return false;
     if (f.developer !== "all" && l.developer !== f.developer) return false;

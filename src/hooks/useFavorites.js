@@ -3,7 +3,7 @@ import { collection, deleteDoc, doc, getDocs, setDoc, serverTimestamp } from "fi
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 
-const KEY = "plotsview-favorites";
+const KEY = "plotscape-favorites";
 
 function readLocal() {
   try {
@@ -87,7 +87,23 @@ export function useFavorites() {
   );
 
   const isFavorite = useCallback((id) => favorites.includes(id), [favorites]);
-  const clear = useCallback(() => setFavorites([]), []);
+  const clear = useCallback(async () => {
+    const ids = favorites;
+    setFavorites([]);
+    if (dbEnabled && user && db && ids.length > 0) {
+      try {
+        await Promise.all(ids.map((id) => deleteDoc(doc(db, "favorites", user.uid, "items", id))));
+      } catch {
+        // a refresh will reconcile
+      }
+    } else {
+      try {
+        localStorage.removeItem(KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }, [favorites, user, dbEnabled]);
 
   return { favorites, toggle, isFavorite, clear, count: favorites.length };
 }

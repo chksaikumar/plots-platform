@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import { useListings } from "../context/ListingsContext";
 import { getListingById, getLocalityTrend } from "../lib/listings";
-import { formatINR, formatINRShort, formatPerSqYd, statusLabel } from "../utils/format";
+import { formatINR, formatPerSqYd, statusLabel } from "../utils/format";
 import { useFavorites } from "../hooks/useFavorites";
 import PlotCard, { PlotArtwork, VastuBadge, ApprovalBadges, StatusPill } from "../components/PlotCard";
 import EmiCalculator from "../components/EmiCalculator";
@@ -132,8 +132,8 @@ export default function PlotDetail() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
-                  { label: "Facing", value: listing.facing },
-                  { label: "Shape", value: listing.plotShape[0].toUpperCase() + listing.plotShape.slice(1) },
+                  { label: "Facing", value: listing.facing || "-" },
+                  { label: "Shape", value: listing.plotShape ? listing.plotShape[0].toUpperCase() + listing.plotShape.slice(1) : "-" },
                   { label: "Status", value: statusLabel(listing.status) },
                 ].map((s) => (
                   <div key={s.label} className="rounded-xl bg-ink-50 px-4 py-3 ring-1 ring-inset ring-ink-100">
@@ -147,7 +147,7 @@ export default function PlotDetail() {
             <div className="mt-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-ink-400">Amenities</div>
               <div className="mt-2.5 flex flex-wrap gap-2">
-                {listing.amenities.map((a) => (
+                {(listing.amenities || []).map((a) => (
                   <span key={a} className="inline-flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-1.5 text-xs font-medium text-ink-700 ring-1 ring-inset ring-ink-100">
                     <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-brand-600" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -221,7 +221,7 @@ export default function PlotDetail() {
               <h3 className="font-display text-xl font-semibold text-ink-950">Developer</h3>
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-700 font-display text-lg font-bold text-white">
-                  {listing.developer[0]}
+                  {(listing.developer || "?")[0]}
                 </div>
                 <div>
                   <div className="text-sm font-bold text-ink-950">{listing.developer}</div>

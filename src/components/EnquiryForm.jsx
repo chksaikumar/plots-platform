@@ -39,7 +39,7 @@ export default function EnquiryForm({ listingId = null, listingTitle = null }) {
         await new Promise((r) => setTimeout(r, 700));
       }
       setStatus("done");
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again or call us directly.");
       setStatus("error");
     }
@@ -99,6 +99,11 @@ export default function EnquiryForm({ listingId = null, listingTitle = null }) {
       >
         {status === "sending" ? "Sending..." : "Request Callback"}
       </button>
+      {!isDbEnabled && (
+        <p className="mt-2.5 rounded-lg bg-gold-50 px-3 py-2 text-center text-[11px] leading-relaxed text-gold-800 ring-1 ring-inset ring-gold-200">
+          Demo mode: this enquiry is not saved anywhere. Connect Firebase to receive real leads.
+        </p>
+      )}
       <p className="mt-2.5 text-center text-[11px] text-ink-400">
         By submitting, you agree to be contacted about this enquiry.
       </p>

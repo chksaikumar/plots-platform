@@ -12,7 +12,7 @@ const links = [
 
 export default function Navbar() {
   const { count } = useFavorites();
-  const { isSignedIn, isAdmin, dbEnabled, signOut } = useAuth();
+  const { isSignedIn, isAdmin, signOut } = useAuth();
   const location = useLocation();
 
   return (
@@ -70,44 +70,40 @@ export default function Navbar() {
           >
             Find Plots
           </Link>
-          {dbEnabled && (
-            <>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className={`hidden rounded-full px-4 py-2.5 text-sm font-semibold transition-all sm:inline-flex ${
-                    location.pathname === "/admin"
-                      ? "bg-ink-950 text-white"
-                      : "border border-ink-200 text-ink-700 hover:border-ink-950"
-                  }`}
-                >
-                  Admin
-                </Link>
-              )}
-              {isSignedIn ? (
-                <div className="hidden items-center gap-1 sm:flex">
-                  <Link
-                    to="/account"
-                    className="rounded-full px-4 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:bg-ink-50"
-                  >
-                    Account
-                  </Link>
-                  <button
-                    onClick={signOut}
-                    className="rounded-full px-3 py-2.5 text-sm font-medium text-ink-400 transition-all hover:text-ink-800"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  to="/signin"
-                  className="hidden rounded-full border border-ink-200 px-5 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:border-brand-400 hover:text-brand-800 sm:inline-flex"
-                >
-                  Sign in
-                </Link>
-              )}
-            </>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`hidden rounded-full px-4 py-2.5 text-sm font-semibold transition-all sm:inline-flex ${
+                location.pathname === "/admin"
+                  ? "bg-ink-950 text-white"
+                  : "border border-ink-200 text-ink-700 hover:border-ink-950"
+              }`}
+            >
+              Admin
+            </Link>
+          )}
+          {isSignedIn ? (
+            <div className="hidden items-center gap-1 sm:flex">
+              <Link
+                to="/account"
+                className="rounded-full px-4 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:bg-ink-50"
+              >
+                Account
+              </Link>
+              <button
+                onClick={signOut}
+                className="rounded-full px-3 py-2.5 text-sm font-medium text-ink-400 transition-all hover:text-ink-800"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/signin"
+              className="hidden rounded-full border border-ink-200 px-5 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:border-brand-400 hover:text-brand-800 sm:inline-flex"
+            >
+              Sign in
+            </Link>
           )}
         </div>
       </div>

@@ -140,7 +140,7 @@ export default function Compare() {
               <tr className="border-t border-ink-100">
                 <td className="p-4 text-xs font-semibold uppercase tracking-wider text-ink-400">Amenities</td>
                 {compared.map((l) => (
-                  <td key={l.id} className="p-4 text-xs leading-relaxed text-ink-600">{l.amenities.join(", ")}</td>
+                  <td key={l.id} className="p-4 text-xs leading-relaxed text-ink-600">{(l.amenities || []).join(", ")}</td>
                 ))}
               </tr>
             </tbody>

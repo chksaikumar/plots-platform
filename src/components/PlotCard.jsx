@@ -55,9 +55,10 @@ export function VastuBadge() {
 }
 
 export function ApprovalBadges({ approvals }) {
+  const list = Array.isArray(approvals) ? approvals : [];
   return (
     <div className="flex flex-wrap gap-1.5">
-      {approvals.map((a) => (
+      {list.map((a) => (
         <span
           key={a}
           className="rounded-md bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-800 ring-1 ring-inset ring-brand-200"

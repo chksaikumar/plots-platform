@@ -39,7 +39,7 @@ export default function Ventures() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-700 font-display text-2xl font-bold text-white shadow-card">
-                        {v.developer[0]}
+                        {(v.developer || "?")[0]}
                       </div>
                       <div>
                         <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-950">{v.developer}</h2>
@@ -54,7 +54,7 @@ export default function Ventures() {
                   <div className="mt-5 grid grid-cols-3 gap-3">
                     <div className="rounded-xl bg-ink-50 p-3.5 text-center ring-1 ring-inset ring-ink-100">
                       <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Starts at</div>
-                      <div className="mt-1 font-display text-lg font-bold text-ink-950">{formatINRShort(v.minPrice)}</div>
+                      <div className="mt-1 font-display text-lg font-bold text-ink-950">{Number.isFinite(v.minPrice) ? formatINRShort(v.minPrice) : "-"}</div>
                     </div>
                     <div className="rounded-xl bg-ink-50 p-3.5 text-center ring-1 ring-inset ring-ink-100">
                       <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Cities</div>

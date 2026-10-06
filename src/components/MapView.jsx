@@ -22,8 +22,9 @@ function pinIcon(listing) {
 function FitBounds({ listings }) {
   const map = useMap();
   useEffect(() => {
-    if (listings.length === 0) return;
-    const bounds = L.latLngBounds(listings.map((l) => [l.lat, l.lng]));
+    const valid = listings.filter((l) => Number.isFinite(l.lat) && Number.isFinite(l.lng));
+    if (valid.length === 0) return;
+    const bounds = L.latLngBounds(valid.map((l) => [l.lat, l.lng]));
     map.fitBounds(bounds.pad(0.15), { animate: true });
   }, [listings, map]);
   return null;
@@ -32,13 +33,17 @@ function FitBounds({ listings }) {
 const INDIA_CENTER = [20.6, 78.9];
 
 export default function MapView({ listings }) {
+  const validListings = useMemo(
+    () => listings.filter((l) => Number.isFinite(l.lat) && Number.isFinite(l.lng)),
+    [listings]
+  );
   const icons = useMemo(() => {
     const map = new Map();
-    listings.forEach((l) => {
+    validListings.forEach((l) => {
       if (!map.has(l.id)) map.set(l.id, pinIcon(l));
     });
     return map;
-  }, [listings]);
+  }, [validListings]);
 
   return (
     <MapContainer
@@ -53,7 +58,7 @@ export default function MapView({ listings }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FitBounds listings={listings} />
-      {listings.map((l) => (
+      {validListings.map((l) => (
         <Marker key={l.id} position={[l.lat, l.lng]} icon={icons.get(l.id)}>
           <Popup>
             <div className="overflow-hidden">
@@ -73,7 +78,7 @@ export default function MapView({ listings }) {
                   <span className="text-[11px] text-ink-400">{l.sizeSqYd} sq.yd.</span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <ApprovalBadges approvals={l.approvals.slice(0, 2)} />
+                  <ApprovalBadges approvals={(l.approvals || []).slice(0, 2)} />
                   {l.vastuFriendly && <VastuBadge />}
                 </div>
                 <Link

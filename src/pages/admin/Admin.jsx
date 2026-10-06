@@ -219,6 +219,7 @@ export default function Admin() {
   const [leadFilter, setLeadFilter] = useState("all");
   const [editing, setEditing] = useState(null); // doc snapshot or "new"
   const [saving, setSaving] = useState(false);
+  const [opError, setOpError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate("/signin");
@@ -249,6 +250,7 @@ export default function Admin() {
 
   const saveListing = async (values) => {
     setSaving(true);
+    setOpError("");
     try {
       const { slug, ...data } = values;
       const payload = { ...data, updatedAt: serverTimestamp() };
@@ -263,6 +265,8 @@ export default function Admin() {
       }
       setEditing(null);
       refresh();
+    } catch {
+      setOpError("Could not save the listing. Check your connection and try again.");
     } finally {
       setSaving(false);
     }
@@ -270,18 +274,33 @@ export default function Admin() {
 
   const removeListing = async (id, title) => {
     if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    await deleteDoc(doc(db, "listings", id));
-    refresh();
+    setOpError("");
+    try {
+      await deleteDoc(doc(db, "listings", id));
+      refresh();
+    } catch {
+      setOpError("Could not delete the listing. Check your connection and try again.");
+    }
   };
 
   const toggleActive = async (d) => {
-    await updateDoc(doc(db, "listings", d.id), { active: !(d.data().active !== false), updatedAt: serverTimestamp() });
-    refresh();
+    setOpError("");
+    try {
+      await updateDoc(doc(db, "listings", d.id), { active: !(d.data().active !== false), updatedAt: serverTimestamp() });
+      refresh();
+    } catch {
+      setOpError("Could not update the listing. Check your connection and try again.");
+    }
   };
 
   const setLeadStatus = async (id, status) => {
-    await updateDoc(doc(db, "enquiries", id), { status });
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
+    setOpError("");
+    try {
+      await updateDoc(doc(db, "enquiries", id), { status });
+      setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
+    } catch {
+      setOpError("Could not update the lead. Check your connection and try again.");
+    }
   };
 
   const filteredListings = useMemo(() => {
@@ -347,9 +366,14 @@ export default function Admin() {
         ))}
       </div>
 
+      {opError && (
+        <div className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 ring-1 ring-inset ring-red-200">
+          {opError}
+        </div>
+      )}
+
       {tab === "dashboard" && (
-        <div className="mt-8">
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <div className="mt-8">          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
             {stats.map((s) => (
               <div key={s.label} className="rounded-2xl bg-white p-6 text-center shadow-card ring-1 ring-ink-100">
                 <div className="font-display text-4xl font-bold text-brand-800">{loading ? "-" : s.value}</div>

@@ -47,15 +47,11 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (!dbEnabled) {
-    return (
-      <AuthShell title="Sign in unavailable" subtitle="Connect Firebase to enable accounts. See FIREBASE_SETUP.md.">
-        <Link to="/" className="block rounded-xl bg-ink-950 px-4 py-3 text-center text-sm font-semibold text-white">Back home</Link>
-      </AuthShell>
-    );
-  }
-
   const go = async (fn) => {
+    if (!dbEnabled) {
+      setError("Demo mode: sign-in activates once Firebase is connected. See FIREBASE_SETUP.md in the project.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -70,6 +66,12 @@ export default function SignIn() {
 
   return (
     <AuthShell title="Welcome back" subtitle="Sign in to sync your shortlist and track enquiries.">
+      {!dbEnabled && (
+        <div className="mb-5 rounded-xl bg-gold-50 px-4 py-3 text-xs leading-relaxed text-gold-800 ring-1 ring-inset ring-gold-200">
+          <span className="font-bold">Demo mode.</span> The site is running on sample data.
+          Sign-in activates once Firebase is connected. See FIREBASE_SETUP.md in the project.
+        </div>
+      )}
       <div className="space-y-3">
         <GoogleButton onClick={() => go(signInWithGoogle)} disabled={busy} label={busy ? "Signing in..." : "Continue with Google"} />
         <div className="flex items-center gap-3 py-1 text-xs text-ink-300">

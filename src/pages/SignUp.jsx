@@ -14,15 +14,11 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (!dbEnabled) {
-    return (
-      <AuthShell title="Sign up unavailable" subtitle="Connect Firebase to enable accounts. See FIREBASE_SETUP.md.">
-        <Link to="/" className="block rounded-xl bg-ink-950 px-4 py-3 text-center text-sm font-semibold text-white">Back home</Link>
-      </AuthShell>
-    );
-  }
-
   const go = async () => {
+    if (!dbEnabled) {
+      setError("Demo mode: sign-up activates once Firebase is connected. See FIREBASE_SETUP.md in the project.");
+      return;
+    }
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -41,6 +37,12 @@ export default function SignUp() {
 
   return (
     <AuthShell title="Create your account" subtitle="Shortlist plots, sync across devices and track your enquiries.">
+      {!dbEnabled && (
+        <div className="mb-5 rounded-xl bg-gold-50 px-4 py-3 text-xs leading-relaxed text-gold-800 ring-1 ring-inset ring-gold-200">
+          <span className="font-bold">Demo mode.</span> The site is running on sample data.
+          Sign-up activates once Firebase is connected. See FIREBASE_SETUP.md in the project.
+        </div>
+      )}
       <div className="space-y-3">
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" type="email" className={inputCls} />
         <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className={inputCls} onKeyDown={(e) => e.key === "Enter" && go()} />

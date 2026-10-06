@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import { useListings } from "../context/ListingsContext";
 import { getListingById } from "../lib/listings";
 import { formatINRShort } from "../utils/format";
-import PlotCard from "../components/PlotCard";
 import Reveal from "../components/Reveal";
 
 const STATUS_STYLES = {
