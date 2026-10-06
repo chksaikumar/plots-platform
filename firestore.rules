@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// PlotScape Firestore security rules.
+// Deploy with: firebase deploy --only firestore:rules
+// (or paste into Firestore > Rules in the Firebase console)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin check via the users collection. No Cloud Functions needed.
+    function isAdmin() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── users/{uid} ──────────────────────────────────────────────
+    // Profile docs. Users manage their own; admins can read all.
+    match /users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow delete: if false;
+    }
+
+    // ── listings/{id} ───────────────────────────────────────────
+    // Public read of active listings; only admins write.
+    match /listings/{id} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── favorites/{uid}/items/{listingId} ───────────────────────
+    // Each user manages only their own shortlist.
+    match /favorites/{uid}/items/{itemId} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── enquiries/{id} ─────────────────────────────────────────
+    // Anyone can submit a lead. Users read their own (by uid or email
+    // match); admins read and update everything.
+    match /enquiries/{id} {
+      allow create: if true;
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+  }
+}
