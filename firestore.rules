@@ -18,11 +18,16 @@ service cloud.firestore {
     }
 
     // ── users/{uid} ──────────────────────────────────────────────
-    // Profile docs. Users manage their own; admins can read all.
+    // Profile docs. Users create their own doc but can only ever assign
+    // themselves the 'user' role; only admins can grant the admin role.
+    // Users may update their own profile but never change their own role.
     match /users/{uid} {
       allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
-      allow create: if isSignedIn() && request.auth.uid == uid;
-      allow update: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.role == 'user';
+      allow update: if isAdmin()
+        || (isSignedIn() && request.auth.uid == uid
+            && request.resource.data.role == resource.data.role);
       allow delete: if false;
     }
 
