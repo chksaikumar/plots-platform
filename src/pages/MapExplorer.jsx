@@ -119,7 +119,7 @@ export default function MapExplorer() {
               <MapView listings={filtered} />
             )}
             <div className="absolute bottom-4 left-4 z-[500] rounded-full bg-ink-950/85 px-4 py-2 text-xs font-medium text-white backdrop-blur">
-              {filtered.length} plots match your filters
+              {loading ? "Loading plots..." : `${filtered.length} plots match your filters`}
             </div>
           </div>
         )}
