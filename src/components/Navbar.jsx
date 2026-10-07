@@ -73,7 +73,7 @@ export default function Navbar() {
           {isAdmin && (
             <Link
               to="/admin"
-              className={`hidden rounded-full px-4 py-2.5 text-sm font-semibold transition-all sm:inline-flex ${
+              className={`inline-flex rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
                 location.pathname === "/admin"
                   ? "bg-ink-950 text-white"
                   : "border border-ink-200 text-ink-700 hover:border-ink-950"
@@ -83,7 +83,7 @@ export default function Navbar() {
             </Link>
           )}
           {isSignedIn ? (
-            <div className="hidden items-center gap-1 sm:flex">
+            <div className="flex items-center gap-1">
               <Link
                 to="/account"
                 className="rounded-full px-4 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:bg-ink-50"
@@ -100,7 +100,7 @@ export default function Navbar() {
           ) : (
             <Link
               to="/signin"
-              className="hidden rounded-full border border-ink-200 px-5 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:border-brand-400 hover:text-brand-800 sm:inline-flex"
+              className="inline-flex rounded-full border border-ink-200 px-5 py-2.5 text-sm font-semibold text-ink-700 transition-all hover:border-brand-400 hover:text-brand-800"
             >
               Sign in
             </Link>
@@ -126,6 +126,49 @@ export default function Navbar() {
         <Link to="/shortlist" className="whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium text-ink-600">
           Shortlist{count > 0 ? ` (${count})` : ""}
         </Link>
+        {isAdmin && (
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              `whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                isActive ? "bg-ink-950 text-white" : "text-ink-600"
+              }`
+            }
+          >
+            Admin
+          </NavLink>
+        )}
+        {isSignedIn ? (
+          <>
+            <NavLink
+              to="/account"
+              className={({ isActive }) =>
+                `whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  isActive ? "bg-brand-50 text-brand-800" : "text-ink-600"
+                }`
+              }
+            >
+              Account
+            </NavLink>
+            <button
+              onClick={signOut}
+              className="whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium text-ink-600"
+            >
+              Sign out
+            </button>
+          </>
+        ) : (
+          <NavLink
+            to="/signin"
+            className={({ isActive }) =>
+              `whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                isActive ? "bg-brand-50 text-brand-800" : "text-ink-600"
+              }`
+            }
+          >
+            Sign in
+          </NavLink>
+        )}
       </nav>
     </header>
   );
